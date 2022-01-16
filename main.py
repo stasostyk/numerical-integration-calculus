@@ -1,3 +1,6 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
 TIMESTEP = 1
 GRAV = 9.81
 
@@ -30,6 +33,13 @@ class Ball(object):
         self.vy = 0
         self.name = name
 
+        self.data_y = [0]
+        self.data_vy = [0]
+
+    def log(self):
+        self.data_y.append(self.y)
+        self.data_vy.append(self.vy)
+
     def __str__(self):
         return self.name + "   y: {0}, vy: {1}".format(self.y, self.vy)
 
@@ -45,18 +55,40 @@ def main():
     print(ball2)
     print(ball3)
 
-    for i in range(1000000):
+    for i in range(5):
         time += 1
+
         standard(ball1)
-        euler(ball2, 10)
+        ball1.log()
+
+        euler(ball2, 5)
+        ball2.log()
+
         runge_kutta_4(ball3)
+        ball3.log()
 
-        print("==== t = {0}s ====".format(time))
-        print(ball1)
-        print(ball2)
-        print(ball3)
-        print("Ideal:     y: {0}, vy {1}".format(0.5*GRAV*time*time, GRAV*time))
+    print("==== t = {0}s ====".format(time))
+    print(ball1)
+    print(ball2)
+    print(ball3)
+    print("Ideal:     y: {0}, vy {1}".format(0.5*GRAV*time*time, GRAV*time))
 
+    # show graphs
+    time_axis = list(range(0, time+1))
+
+    diff = np.subtract(ball3.data_y, ball1.data_y)
+    ideal = [0.5*GRAV*t*t for t in range(time+1)]
+
+    plt.plot(time_axis, diff, label="RK4-Standard Difference")
+    plt.plot(time_axis, ball3.data_y, label="RK4")
+    plt.plot(time_axis, ball2.data_y, label="Euler")
+    plt.plot(time_axis, ball1.data_y, label="Standard")
+    plt.plot(time_axis, ideal, label="Ideal")
+    plt.xlabel('time')
+    plt.ylabel('meters')
+    plt.title('RK4-Euler Difference Graph')
+    plt.legend()
+    plt.show()
 
 if __name__ == "__main__":
     main()
