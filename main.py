@@ -7,11 +7,13 @@ GRAV = 9.81
 def standard(ball):
     ball.vy += GRAV*TIMESTEP
     ball.y += ball.vy*TIMESTEP
+    ball.bounce()
 
 def euler(ball, h):
     for i in range(h):
         ball.vy += GRAV*TIMESTEP/h
         ball.y += ball.vy*TIMESTEP/h
+        ball.bounce()
 
 def dydt(vy, t):
     return vy + t*GRAV
@@ -25,6 +27,7 @@ def runge_kutta_4(ball):
 
     ball.y += TIMESTEP * (k1 + 2*k2 + 2*k3 + k4)/6
     ball.vy += GRAV*TIMESTEP
+    ball.bounce()
 
 
 class Ball(object):
@@ -35,6 +38,10 @@ class Ball(object):
 
         self.data_y = [0]
         self.data_vy = [0]
+
+    def bounce(self):
+        if self.y >= 500:
+            self.vy *= -1
 
     def log(self):
         self.data_y.append(self.y)
@@ -55,7 +62,7 @@ def main():
     print(ball2)
     print(ball3)
 
-    for i in range(5):
+    for i in range(500):
         time += 1
 
         standard(ball1)
@@ -79,11 +86,11 @@ def main():
     diff = np.subtract(ball3.data_y, ball1.data_y)
     ideal = [0.5*GRAV*t*t for t in range(time+1)]
 
-    plt.plot(time_axis, diff, label="RK4-Standard Difference")
+    # plt.plot(time_axis, diff, label="RK4-Standard Difference")
     plt.plot(time_axis, ball3.data_y, label="RK4")
     plt.plot(time_axis, ball2.data_y, label="Euler")
     plt.plot(time_axis, ball1.data_y, label="Standard")
-    plt.plot(time_axis, ideal, label="Ideal")
+    # plt.plot(time_axis, ideal, label="Ideal")
     plt.xlabel('time')
     plt.ylabel('meters')
     plt.title('RK4-Euler Difference Graph')
