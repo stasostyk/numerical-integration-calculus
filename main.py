@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.signal import argrelextrema
 
 # ============ GLOBAL VARIABLES ============ #
 # timestep for the simulation -- 1/(computations per second)
@@ -10,6 +11,8 @@ GRAV = 9.81
 BOUNCE = True
 # height, in meters, at which the ball should bounce
 HEIGHT = 50
+# show trendline for error graph
+MAXIMA = True
 
 
 # ============ IMPLICIT INTEGRATION METHODS ============ #
@@ -139,6 +142,15 @@ def main():
     plt.figure(2)
     plt.plot(time_axis, RK4vsSTDRD, label="RK4-Standard Difference")
     plt.plot(time_axis, RK4vsEULER, label="RK4-Euler Difference")
+
+    # find all maxima
+    if MAXIMA:
+        maxima_x = np.array(argrelextrema(RK4vsEULER, np.greater))[0]
+        np.insert(maxima_x, 0, 0)
+        maxima_y = [RK4vsEULER[maxima_x[i]] for i in range(len(maxima_x))]
+        maxima_x = [i*TIMESTEP for i in maxima_x]
+        plt.plot(maxima_x, maxima_y, label="Error Maxima")
+
     plt.xlabel('time (seconds)')
     plt.ylabel('difference (meters)')
     plt.title('Error-Time Graph')
