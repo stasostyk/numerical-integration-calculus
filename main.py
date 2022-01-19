@@ -13,7 +13,6 @@ HEIGHT = 50
 
 
 # ============ IMPLICIT INTEGRATION METHODS ============ #
-
 # Conventional Integration Approximation
 def standard(ball):
     ball.vy += GRAV*TIMESTEP
@@ -86,7 +85,6 @@ def main():
 
 
     # ============ MAINLOOP ============ #
-
     for i in range(round(seconds/TIMESTEP)):
         # time goes up by one -- note, this time is not in seconds, rather frames
         time += 1
@@ -112,19 +110,15 @@ def main():
 
 
     # ============ GRAPHICS DISPLAY ============ #
-
     # time axis, computed using timestep for real-world seconds
     time_axis = np.array(list(range(0, time+1)))*TIMESTEP
 
-    # difference between the positions of RK4 and Standard integration methods across time
-    diff = np.subtract(ball3.data_y, ball1.data_y)
     # implicitly solved ODE -- note, this only works when BOUNCE = 'False'
     ideal = [0.5*GRAV*t*t*TIMESTEP*TIMESTEP for t in range(int(time+1))]
 
-
+    # position-time graph
+    plt.figure(1)
     # load all plotlines to be shown on graph
-
-    # plt.plot(time_axis, diff, label="RK4-Standard Difference")
     plt.plot(time_axis, ball3.data_y, label="RK4")
     plt.plot(time_axis, ball2.data_y, label="Euler")
     plt.plot(time_axis, ball1.data_y, label="Standard")
@@ -135,6 +129,21 @@ def main():
     plt.ylabel('position (meters)')
     plt.title('Position-Time Graph')
     plt.legend()
+
+    # error graph
+
+    # difference between the positions of RK4 and other integration methods across time
+    RK4vsSTDRD = np.subtract(ball3.data_y, ball1.data_y)
+    RK4vsEULER = np.subtract(ball3.data_y, ball2.data_y)
+
+    plt.figure(2)
+    plt.plot(time_axis, RK4vsSTDRD, label="RK4-Standard Difference")
+    plt.plot(time_axis, RK4vsEULER, label="RK4-Euler Difference")
+    plt.xlabel('time (seconds)')
+    plt.ylabel('difference (meters)')
+    plt.title('Error-Time Graph')
+    plt.legend()
+
     plt.show()
 
 
