@@ -105,7 +105,7 @@ def main():
     # end mainloop
 
     # print final status of simulation
-    print("==== t = {0}s ====".format(time))
+    print("==== t = {0}s ====".format(time*TIMESTEP))
     print(ball1)
     print(ball2)
     print(ball3)
@@ -146,9 +146,11 @@ def main():
     # find all maxima
     if MAXIMA:
         maxima_x = np.array(argrelextrema(RK4vsEULER, np.greater))[0]
-        np.insert(maxima_x, 0, 0)
         maxima_y = [RK4vsEULER[maxima_x[i]] for i in range(len(maxima_x))]
         maxima_x = [i*TIMESTEP for i in maxima_x]
+        maxima_x.insert(0,0)
+        maxima_y.insert(0,0)
+        print(maxima_x)
         plt.plot(maxima_x, maxima_y, label="Error Maxima")
 
     plt.xlabel('time (seconds)')
