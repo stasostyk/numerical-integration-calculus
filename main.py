@@ -6,11 +6,11 @@ from scipy.signal import argrelextrema
 # timestep for the simulation -- 1/(computations per second)
 TIMESTEP = 1/30
 # gravitational constant 'g', in meters per seconds squared
-GRAV = 9.81
+GRAV = -9.81
 # should the ball bounce or not
 BOUNCE = True
 # height, in meters, at which the ball should bounce
-HEIGHT = 50
+HEIGHT = 0
 # show trendline for error graph
 MAXIMA = True
 
@@ -46,9 +46,9 @@ def runge_kutta_4(ball):
 
 # class object of mass, generalized to a ball
 class Ball(object):
-    def __init__(self, name):
+    def __init__(self, name, vy):
         self.y = 0
-        self.vy = 0
+        self.vy = vy
         self.name = name
 
         self.data_y = [0]
@@ -56,7 +56,7 @@ class Ball(object):
 
 # check for collision with floor
     def bounce(self):
-        if BOUNCE and self.y >= HEIGHT and self.vy > 0:
+        if BOUNCE and self.y <= HEIGHT and self.vy < 0:
             self.vy *= -1
             return True
         return False
@@ -82,9 +82,9 @@ def main():
     seconds = float(input("Seconds: "))
 
     # initialize instances of all test objects
-    ball1 = Ball("Standard")
-    ball2 = Ball("Euler   ")
-    ball3 = Ball("RK4     ")
+    ball1 = Ball("Standard", 20)
+    ball2 = Ball("Euler   ", 20)
+    ball3 = Ball("RK4     ", 20)
 
 
     # ============ MAINLOOP ============ #
