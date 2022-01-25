@@ -24,9 +24,9 @@ def euler(ball):
 
 # Euler Method Integration Approximation
 def double_euler(ball, h):
-    for i in range(h):
-        ball.vy += GRAV*TIMESTEP/h
-        ball.y += ball.vy*TIMESTEP/h
+    for i in range(round(h):
+        ball.vy += GRAV*TIMESTEP*h
+        ball.y += ball.vy*TIMESTEP*h
     ball.bounce()
 
 # Ordinary Differential Equation being solved
@@ -96,7 +96,7 @@ def main():
         euler(ball1)
         ball1.log()
 
-        double_euler(ball2, 5)
+        double_euler(ball2, 0.2)
         ball2.log()
 
         runge_kutta_4(ball3)
