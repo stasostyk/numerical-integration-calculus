@@ -17,13 +17,13 @@ MAXIMA = True
 
 # ============ IMPLICIT INTEGRATION METHODS ============ #
 # Conventional Integration Approximation
-def standard(ball):
+def euler(ball):
     ball.vy += GRAV*TIMESTEP
     ball.y += ball.vy*TIMESTEP
     ball.bounce()
 
 # Euler Method Integration Approximation
-def euler(ball, h):
+def double_euler(ball, h):
     for i in range(h):
         ball.vy += GRAV*TIMESTEP/h
         ball.y += ball.vy*TIMESTEP/h
@@ -93,10 +93,10 @@ def main():
         time += 1
 
         # approximate rate of change of each ball and apply it
-        standard(ball1)
+        euler(ball1)
         ball1.log()
 
-        euler(ball2, 5)
+        double_euler(ball2, 5)
         ball2.log()
 
         runge_kutta_4(ball3)
@@ -123,8 +123,8 @@ def main():
     plt.figure(1)
     # load all plotlines to be shown on graph
     plt.plot(time_axis, ball3.data_y, label="RK4")
-    plt.plot(time_axis, ball2.data_y, label="Euler")
-    plt.plot(time_axis, ball1.data_y, label="Standard")
+    plt.plot(time_axis, ball2.data_y, label="Double Euler")
+    plt.plot(time_axis, ball1.data_y, label="Euler")
     # plt.plot(time_axis, ideal, label="Ideal")
 
     # setup graph parameters
