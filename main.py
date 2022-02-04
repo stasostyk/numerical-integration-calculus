@@ -112,10 +112,10 @@ def main():
         time += 1
 
         # approximate rate of change of each ball and apply it
-        standard(ball1)
+        euler(ball1)
         ball1.log()
 
-        euler(ball2, 5)
+        double_euler(ball2, 0.2)
         ball2.log()
 
         runge_kutta_4(ball3)
