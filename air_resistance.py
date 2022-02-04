@@ -14,13 +14,19 @@ HEIGHT = 0
 # show trendline for error graph
 MAXIMA = True
 # drag coefficient
-K = 0.5
+K = 0.1
 
 # ============ IMPLICIT INTEGRATION METHODS ============ #
 # Conventional Integration Approximation
 def standard(ball):
-    ball.vy += (GRAV - abs(ball.vy)*ball.vy*K)*TIMESTEP
-    ball.y += ball.vy*TIMESTEP
+    new_vy = ball.vy + (GRAV - abs(ball.vy)*ball.vy*K)*TIMESTEP
+    new_y = ball.y + new_vy*TIMESTEP
+
+    if new_y < -abs(new_vy):
+        return
+
+    ball.vy = new_vy
+    ball.y = new_y
 
     ball.vx -= abs(ball.vx)*ball.vx*K*TIMESTEP
     ball.x += ball.vx*TIMESTEP
@@ -30,8 +36,14 @@ def standard(ball):
 # Euler Method Integration Approximation
 def euler(ball, h):
     for i in range(h):
-        ball.vy += (GRAV - abs(ball.vy)*ball.vy*K)*TIMESTEP/h
-        ball.y += ball.vy*TIMESTEP/h
+        new_vy = ball.vy + (GRAV - abs(ball.vy)*ball.vy*K)*TIMESTEP/h
+        new_y = ball.y + new_vy*TIMESTEP/h
+
+        if new_y < -abs(new_vy):
+            return
+
+        ball.vy = new_vy
+        ball.y = new_y
 
     for i in range(h):
         ball.vx -= abs(ball.vx)*ball.vx*K*TIMESTEP/h
@@ -116,6 +128,10 @@ def main():
     ball2 = Ball("Euler   ", 15, 25)
     ball3 = Ball("RK4     ", 15, 25)
 
+    ball4 = Ball("RK4-2   ", 15, 5)
+    ball5 = Ball("RK4-3   ", 15, 10)
+    ball6 = Ball("RK4-3   ", 15, 80)
+
 
     # ============ MAINLOOP ============ #
     for i in range(round(seconds/TIMESTEP)):
@@ -131,6 +147,12 @@ def main():
 
         runge_kutta_4(ball3)
         ball3.log()
+        runge_kutta_4(ball4)
+        ball4.log()
+        runge_kutta_4(ball5)
+        ball5.log()
+        runge_kutta_4(ball6)
+        ball6.log()
 
     # end mainloop
 
@@ -152,9 +174,12 @@ def main():
     # position-time graph
     plt.figure(1)
     # load all plotlines to be shown on graph
-    plt.plot(ball3.data_x, ball3.data_y, label="RK4")
-    plt.plot(ball3.data_x, ball2.data_y, label="Euler")
-    plt.plot(ball3.data_x, ball1.data_y, label="Standard")
+    plt.plot(ball4.data_x, ball4.data_y, label="(15, 5)")
+    plt.plot(ball5.data_x, ball5.data_y, label="(15, 10)")
+    plt.plot(ball3.data_x, ball3.data_y, label="(15, 25)")
+    plt.plot(ball6.data_x, ball6.data_y, label="(15, 80)")
+    # plt.plot(ball3.data_x, ball2.data_y, label="Double-Euler")
+    # plt.plot(ball3.data_x, ball1.data_y, label="Euler")
     # plt.plot(time_axis, ideal, label="Ideal")
 
     # setup graph parameters
@@ -170,8 +195,8 @@ def main():
     RK4vsEULER = np.subtract(ball3.data_y, ball2.data_y)
 
     plt.figure(2)
-    plt.plot(time_axis, RK4vsSTDRD, label="RK4-Standard Difference")
-    plt.plot(time_axis, RK4vsEULER, label="RK4-Euler Difference")
+    # plt.plot(time_axis, RK4vsSTDRD, label="RK4-Euler Difference")
+    plt.plot(time_axis, RK4vsEULER, label="RK4-Double-Euler Difference")
 
     # find all maxima
     if MAXIMA:

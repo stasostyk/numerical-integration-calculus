@@ -18,15 +18,28 @@ MAXIMA = True
 # ============ IMPLICIT INTEGRATION METHODS ============ #
 # Conventional Integration Approximation
 def standard(ball):
-    ball.vy += GRAV*TIMESTEP
-    ball.y += ball.vy*TIMESTEP
+    new_vy = ball.vy + GRAV*TIMESTEP
+    new_y = ball.y + new_vy*TIMESTEP
+
+    if new_y < -abs(new_vy):
+        return
+
+    ball.vy = new_vy
+    ball.y = new_y
+
     ball.bounce()
 
 # Euler Method Integration Approximation
 def euler(ball, h):
     for i in range(h):
-        ball.vy += GRAV*TIMESTEP/h
-        ball.y += ball.vy*TIMESTEP/h
+        new_vy = ball.vy + GRAV*TIMESTEP/h
+        new_y = ball.y + new_vy*TIMESTEP/h
+
+        if new_y < -abs(new_vy):
+            return
+
+        ball.vy = new_vy
+        ball.y = new_y
     ball.bounce()
 
 # Ordinary Differential Equation being solved
@@ -40,8 +53,13 @@ def runge_kutta_4(ball):
     k3 = dydt(ball.vy, TIMESTEP * 0.5)
     k4 = dydt(ball.vy, TIMESTEP * 1)
 
-    ball.y += TIMESTEP * (k1 + 2*k2 + 2*k3 + k4)/6
-    ball.vy += GRAV*TIMESTEP
+    new_y = ball.y + TIMESTEP * (k1 + 2*k2 + 2*k3 + k4)/6
+    new_vy = ball.vy + GRAV*TIMESTEP
+
+    if new_y < -abs(new_vy):
+        return
+    ball.y = new_y
+    ball.vy = new_vy
     ball.bounce()
 
 # class object of mass, generalized to a ball
@@ -57,7 +75,7 @@ class Ball(object):
 # check for collision with floor
     def bounce(self):
         if BOUNCE and self.y <= HEIGHT and self.vy < 0:
-            self.vy *= -1
+            self.vy = abs(self.vy)
             return True
         return False
 
@@ -82,9 +100,10 @@ def main():
     seconds = float(input("Seconds: "))
 
     # initialize instances of all test objects
-    ball1 = Ball("Standard", 20)
-    ball2 = Ball("Euler   ", 20)
-    ball3 = Ball("RK4     ", 20)
+    initial_v = 20
+    ball1 = Ball("Standard", initial_v)
+    ball2 = Ball("Euler   ", initial_v)
+    ball3 = Ball("RK4     ", initial_v)
 
 
     # ============ MAINLOOP ============ #
@@ -123,8 +142,8 @@ def main():
     plt.figure(1)
     # load all plotlines to be shown on graph
     plt.plot(time_axis, ball3.data_y, label="RK4")
-    plt.plot(time_axis, ball2.data_y, label="Euler")
-    plt.plot(time_axis, ball1.data_y, label="Standard")
+    plt.plot(time_axis, ball2.data_y, label="Double Euler")
+    plt.plot(time_axis, ball1.data_y, label="Euler")
     # plt.plot(time_axis, ideal, label="Ideal")
 
     # setup graph parameters
@@ -139,9 +158,12 @@ def main():
     RK4vsSTDRD = np.subtract(ball3.data_y, ball1.data_y)
     RK4vsEULER = np.subtract(ball3.data_y, ball2.data_y)
 
+    print("position was " + str(ideal[len(ideal)-1]))
+    print("max diff was " + str((ball3.data_y[len(ball3.data_y)-1] - ideal[len(ideal)-1])))
+
     plt.figure(2)
-    plt.plot(time_axis, RK4vsSTDRD, label="RK4-Standard Difference")
-    plt.plot(time_axis, RK4vsEULER, label="RK4-Euler Difference")
+    # plt.plot(time_axis, RK4vsSTDRD, label="RK4-Euler Difference")
+    plt.plot(time_axis, RK4vsEULER, label="RK4-Double-Euler Difference")
 
     # find all maxima
     if MAXIMA:
