@@ -76,8 +76,7 @@ class Ball(object):
     def bounce(self):
         if BOUNCE and self.y <= HEIGHT and self.vy < 0:
             self.vy = abs(self.vy)
-            return True
-        return False
+
 
 # log current position and velocity
     def log(self):
